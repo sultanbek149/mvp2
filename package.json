@@ -2,7 +2,7 @@
   "name": "waybill-mvp",
   "version": "1.0.0",
   "private": true,
-  "scripts": {
+   "scripts": {
     "dev": "nuxt dev",
     "start": "nuxt start",
     "build": "npm run db:migrate && nuxt build",
