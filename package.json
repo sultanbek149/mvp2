@@ -1,0 +1,29 @@
+{
+  "name": "waybill-mvp",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "preview": "nuxt preview",
+    "db:migrate": "prisma migrate dev",
+    "db:seed": "node prisma/seed.js",
+    "db:studio": "prisma studio",
+    "db:reset": "prisma migrate reset --force && node prisma/seed.js"
+  },
+  "dependencies": {
+    "@nuxtjs/tailwindcss": "^6.12.0",
+    "@prisma/client": "^5.22.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "nuxt": "^3.13.0",
+    "vue": "^3.5.0",
+    "vue-router": "^4.4.0",
+    "zod": "^3.23.8",
+    "xlsx": "^0.18.5",
+    "leaflet": "^1.9.4"
+  },
+  "devDependencies": {
+    "prisma": "^5.22.0"
+  }
+}

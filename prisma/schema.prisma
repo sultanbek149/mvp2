@@ -1,0 +1,166 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  DISPATCHER
+  DRIVER
+}
+
+enum FuelType {
+  DIESEL
+  GASOLINE
+  GAS
+  ELECTRIC
+}
+
+enum CarStatus {
+  ACTIVE
+  MAINTENANCE
+  INACTIVE
+}
+
+enum WaybillStatus {
+  DRAFT
+  ACTIVE
+  CLOSED
+  CANCELLED
+}
+
+enum FuelOpType {
+  REFUEL
+  CONSUMPTION
+  CORRECTION
+}
+
+enum MaintenanceType {
+  TO1
+  TO2
+  TO3
+  REPAIR
+  OTHER
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  role         Role     @default(DISPATCHER)
+  name         String
+  phone        String?
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  driver         Driver?
+  createdWaybills Waybill[]   @relation("CreatedBy")
+  fuelOps        FuelOperation[]
+  maintenanceLogs Maintenance[]
+}
+
+model Car {
+  id              String    @id @default(uuid())
+  brand           String
+  model           String
+  plateNumber     String    @unique
+  year            Int
+  fuelType        FuelType  @default(DIESEL)
+  tankCapacity    Float     @default(100)
+  fuelBalance     Float     @default(0)
+  totalMileage    Int       @default(0)
+  lastTo1Mileage  Int       @default(0)
+  lastTo2Mileage  Int       @default(0)
+  lastTo3Mileage  Int       @default(0)
+  status          CarStatus @default(ACTIVE)
+  notes           String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  waybills     Waybill[]
+  fuelOps      FuelOperation[]
+  maintenance  Maintenance[]
+}
+
+model Driver {
+  id              String   @id @default(uuid())
+  userId          String?  @unique
+  user            User?    @relation(fields: [userId], references: [id])
+  licenseNumber   String   @unique
+  licenseCategory String   @default("B")
+  licenseExpiry   DateTime
+  name            String
+  phone           String?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  waybills Waybill[]
+}
+
+model Waybill {
+  id           String        @id @default(uuid())
+  number       String        @unique
+  carId        String
+  car          Car           @relation(fields: [carId], references: [id])
+  driverId     String
+  driver       Driver        @relation(fields: [driverId], references: [id])
+  createdById  String
+  createdBy    User          @relation("CreatedBy", fields: [createdById], references: [id])
+  date         DateTime      @default(now())
+  startMileage Int
+  endMileage   Int?
+  fuelStart    Float
+  fuelAdded    Float         @default(0)
+  fuelEnd      Float?
+  fuelConsumed Float?
+  routeStart   String?
+  routeEnd     String?
+  startLat     Float?
+  startLng     Float?
+  endLat       Float?
+  endLng       Float?
+  status       WaybillStatus @default(ACTIVE)
+  notes        String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  fuelOps FuelOperation[]
+}
+
+model FuelOperation {
+  id            String     @id @default(uuid())
+  carId         String
+  car           Car        @relation(fields: [carId], references: [id])
+  waybillId     String?
+  waybill       Waybill?   @relation(fields: [waybillId], references: [id])
+  type          FuelOpType
+  amount        Float
+  balanceBefore Float
+  balanceAfter  Float
+  operatorId    String
+  operator      User       @relation(fields: [operatorId], references: [id])
+  notes         String?
+  createdAt     DateTime   @default(now())
+}
+
+model Maintenance {
+  id                  String          @id @default(uuid())
+  carId               String
+  car                 Car             @relation(fields: [carId], references: [id])
+  type                MaintenanceType
+  mileageAtService    Int
+  nextServiceMileage  Int
+  serviceDate         DateTime
+  cost                Float?
+  description         String?
+  performedById       String
+  performedBy         User            @relation(fields: [performedById], references: [id])
+  createdAt           DateTime        @default(now())
+}
