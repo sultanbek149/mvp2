@@ -7,7 +7,7 @@
     "start": "nuxt start",
     "build": "npm run db:migrate && nuxt build",
     "preview": "nuxt preview",
-    "db:migrate": "prisma migrate dev",
+    "db:migrate": "prisma migrate deploy",
     "db:seed": "node prisma/seed.js",
     "db:studio": "prisma studio",
     "db:reset": "prisma migrate reset --force && node prisma/seed.js"
